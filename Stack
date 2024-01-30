@@ -1,0 +1,104 @@
+//38
+#include <bits/stdc++.h>
+using namespace std;
+#define MAX 1000
+
+struct Stack
+{
+    int top = -1;
+
+    char a[MAX];
+    void push(int x);
+    char pop();
+    char peek();
+    bool isEmpty();
+};
+
+void Stack ::push(int x)
+{
+    if (top >= MAX - 1)
+    {
+        cout << "Stack Overflow!" << endl;
+    }
+    else
+    {
+        a[++top] = x;
+    }
+}
+
+char Stack ::pop()
+{
+    if (top < 0)
+    {
+        cout << "Stack Underflow :(" << endl;
+    }
+    else
+    {
+        int x = a[top--];
+        return x;
+    }
+}
+
+char Stack ::peek()
+{
+    return a[top];
+}
+
+bool Stack ::isEmpty()
+{
+    return top < 0;
+}
+
+int prec(char a)
+{
+    if (a == '+' or a == '-')
+        return 1;
+    else if (a == '*' or a == '/')
+        return 2;
+    else if (a == '^')
+        return 3;
+    else
+        return -1;
+}
+
+int main()
+{
+    string str;
+    cin >> str;
+
+    Stack stack;
+
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (str[i] >= 'A' and str[i] <= 'Z' or str[i] >= 'a' and str[i] <= 'z')
+            cout << str[i];
+        else if (str[i] == '(')
+            stack.push(str[i]);
+        else if (str[i] == ')')
+        {
+            while (stack.peek() != '(')
+            {
+                cout << stack.peek();
+                stack.pop();
+            }
+            stack.pop();
+        }
+        else
+        {
+            while (!stack.isEmpty() and prec(str[i]) <= prec(stack.peek()))
+            {
+                cout << stack.peek();
+                stack.pop();
+            }
+            stack.push(str[i]);
+        }
+    }
+
+    while (!stack.isEmpty())
+    {
+        cout << stack.peek();
+        stack.pop();
+    }
+    cout << endl;
+    return 0;
+}
