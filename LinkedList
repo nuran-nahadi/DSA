@@ -1,0 +1,53 @@
+struct node
+{
+    int val;
+    node *next;
+};
+
+void insertLast(int x)
+{
+
+    node *a = new node;
+    a->next = NULL;
+    a->val = x;
+    if (tail)
+    {
+        tail->next = a;
+        tail = a;
+    }
+    else
+    {
+        head = a;
+        tail = a;
+    }
+}
+void insertFirst(int x)
+    {
+        node* a = new node();
+        a->next = NULL;
+        a->val = x;
+        if (head == NULL)
+        {
+            head = a;
+            tail = a;
+        }
+        else
+        {
+            a->next = head;
+            head = a;
+        }
+        
+        return;
+        //Your code ends here #001
+        
+    }
+
+void printList()
+{
+    node* p = head;
+    while(p != NULL){
+        cout << p->val << endl;
+        p = p->next;
+    }
+    return;
+}
