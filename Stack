@@ -49,7 +49,7 @@ bool Stack ::isEmpty()
     return top < 0;
 }
 
-int prec(char a)
+int precedence(char a)
 {
     if (a == '+' or a == '-')
         return 1;
@@ -85,7 +85,7 @@ int main()
         }
         else
         {
-            while (!stack.isEmpty() and prec(str[i]) <= prec(stack.peek()))
+            while (!stack.isEmpty() and precedence(str[i]) <= prec(stack.peek()))
             {
                 cout << stack.peek();
                 stack.pop();
