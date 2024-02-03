@@ -102,3 +102,55 @@ int main()
     cout << endl;
     return 0;
 }
+
+int main()
+{
+    string s;
+    cin>>s;
+    
+
+    Stack mat;
+    for (int i = 0; i <s.length(); i++)
+    {
+        if (s[i]<='9'&& s[i]>='0')
+        {
+            mat.push(s[i]-'0');
+        }
+        else 
+        {
+            int a = mat.pop();
+            int b = mat.pop();
+            char c = s[i];
+            
+
+            if (c=='+')
+            {
+                int r = b + a;
+                
+                mat.push(r);
+            }
+            else if (c=='*')
+            {
+                int r = b * a;
+                
+                mat.push(r);
+            }
+            else if (c=='-')
+            {
+                int r = b - a;
+                
+                mat.push(r);
+            }
+            else if (c=='/')
+            {
+                int r =(double) b /(double) a;
+                
+                mat.push(r);
+            }
+
+        }
+    }
+    cout<<mat.pop();
+    
+    return 0;
+}
