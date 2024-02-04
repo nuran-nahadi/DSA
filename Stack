@@ -85,7 +85,7 @@ int main()
         }
         else
         {
-            while (!stack.isEmpty() and precedence(str[i]) <= prec(stack.peek()))
+            while (!stack.isEmpty() and precedence(str[i]) <= precedence(stack.peek()))
             {
                 cout << stack.peek();
                 stack.pop();
