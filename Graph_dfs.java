@@ -3,13 +3,16 @@ import java.util.*;
 import java.io.File;
 
 class Graph {
-    private List<List<Integer>> adj_list;
+    List<List<Integer>> adj_list;
+    private List<List<Integer>> reverse_list;
     private Set<Integer> vertex;
     private Stack<Integer> topology = new Stack<>();
+    private Stack<Integer> scc_stack = new Stack<>();
     int[] prev;
     int[] distance;
     int[] bfs_state;
     int[] dfs_state;
+    int[] transpose_visited;
     int[] disco;
     int[] fin;
     int time = 0;
@@ -20,12 +23,16 @@ class Graph {
             Scanner sc = new Scanner(new File(filename));
             int n = sc.nextInt();
             int e = sc.nextInt();
-            
+
             adj_list = new ArrayList<>();
+            reverse_list = new ArrayList<>();
             vertex = new LinkedHashSet<Integer>();
-            cap = n+1;
+            cap = n + 1;
             for (int i = 0; i <= cap; i++) {
-                adj_list.add(new ArrayList<>()); 
+                adj_list.add(new ArrayList<>());
+            }
+            for (int i = 0; i <= cap; i++) {
+                reverse_list.add(new ArrayList<>());
             }
             for (int i = 0; i < e; i++) {
                 int u = sc.nextInt();
@@ -34,29 +41,30 @@ class Graph {
             }
             init();
             sc.close();
-        }catch(Exception e)
-            {
+        } catch (Exception e) {
             e.printStackTrace();
-            }
+        }
     }
 
-    private void init(){
+    private void init() {
         prev = new int[1000000];
         distance = new int[1000000];
         dfs_state = new int[1000000];
         disco = new int[1000000];
         fin = new int[1000000];
         bfs_state = new int[1000000];
+        transpose_visited = new int[1000000];
 
-        for (int i=0; i < cap; i++) {
+        for (int i = 0; i < cap; i++) {
             dfs_state[i] = 0;
+            transpose_visited[i] = 0;
             disco[i] = Integer.MAX_VALUE;
             fin[i] = Integer.MAX_VALUE;
             prev[i] = Integer.MIN_VALUE;
         }
 
     }
-    
+
     public void add_edge(int u, int v) {
 
         adj_list.get(u).add(v);
@@ -65,8 +73,9 @@ class Graph {
         vertex.add(v);
     }
 
-    public void add_directed_edge(int u,int v){
+    public void add_directed_edge(int u, int v) {
         adj_list.get(u).add(v);
+        reverse_list.get(v).add(u);
         vertex.add(u);
         vertex.add(v);
     }
@@ -81,9 +90,9 @@ class Graph {
     public void bfs_easy(int s) {
 
         Queue<Integer> q = new LinkedList<>();
-        boolean[] visited = new boolean[adj_list.size()];
+        boolean[] transpose_visited = new boolean[adj_list.size()];
 
-        visited[s] = true;
+        transpose_visited[s] = true;
         q.add(s);
 
         while (!q.isEmpty()) {
@@ -92,8 +101,8 @@ class Graph {
             System.out.print(current + " ");
 
             for (int i : adj_list.get(current)) {
-                if (!visited[i]) {
-                    visited[i] = true;
+                if (!transpose_visited[i]) {
+                    transpose_visited[i] = true;
                     q.add(i);
                 }
             }
@@ -102,12 +111,12 @@ class Graph {
 
     public void BFS(int s) {
         Queue<Integer> q = new LinkedList<>();
-        //bfs_state = new int[cap];
+        // bfs_state = new int[cap];
 
         // distance = new int[cap];
         // prev = new int[cap];
 
-        for (int i=0; i < cap; i++) {
+        for (int i = 0; i < cap; i++) {
             bfs_state[i] = 0;
             distance[i] = Integer.MAX_VALUE;
             prev[i] = Integer.MIN_VALUE;
@@ -135,26 +144,25 @@ class Graph {
         System.out.println();
     }
 
+    public void DFS(int s) {
 
-    public void DFS(int s){
-        
         // dfs_state = new int[cap];
 
         // disco = new int[cap];
         // fin = new int[cap];
         // prev = new int[cap];
 
-        for (int i=0; i < cap; i++) {
-            dfs_state[i] = 0;
-            disco[i] = Integer.MAX_VALUE;
-            fin[i] = Integer.MAX_VALUE;
-            prev[i] = Integer.MIN_VALUE;
-        }
-        System.out.print("DFS traversal starting from vertex "+ s +":");
+        // for (int i = 0; i < cap; i++) {
+        //     dfs_state[i] = 0;
+        //     disco[i] = Integer.MAX_VALUE;
+        //     fin[i] = Integer.MAX_VALUE;
+        //     prev[i] = Integer.MIN_VALUE;
+        // }
+        System.out.print("DFS traversal starting from vertex " + s + ":");
         DFS_visit(s);
     }
 
-    public void DFS_visit(int u){
+    public void DFS_visit(int u) {
         dfs_state[u] = 1;
         time++;
         disco[u] = time;
@@ -171,14 +179,14 @@ class Graph {
         topology.push(u);
     }
 
-    private void dfsTraversal(int u){
+    private void dfsTraversal(int u) {
         dfs_state[u] = 1;
         time++;
         disco[u] = time;
         for (int i : adj_list.get(u)) {
             if (dfs_state[i] == 0) {
                 prev[i] = u;
-                DFS_visit(i);
+                dfsTraversal(i);
             }
         }
         dfs_state[u] = 2;
@@ -186,12 +194,13 @@ class Graph {
         fin[u] = time;
         topology.push(u);
     }
-    public List<Integer> topologicalSort(){
-        for(int i : vertex){
+
+    public List<Integer> topologicalSort() {
+        for (int i : vertex) {
             if (dfs_state[i] == 0) {
                 dfsTraversal(i);
             }
-            
+
         }
         List<Integer> toporder = new LinkedList<>();
         while (!topology.empty()) {
@@ -200,21 +209,51 @@ class Graph {
         return toporder;
     }
 
+    private void dfscc(int u, int[] visited){
+        visited[u] = 1;
+        time++;
+        disco[u] = time;
+        for (int i : adj_list.get(u)) {
+            if (visited[i] == 0) {
+                prev[i] = u;
+                dfscc(i,visited);
+            }
+        }
+        visited[u] = 2;
+        time++;
+        fin[u] = time;
+        scc_stack.push(u);
+    }
 
+    public List<List<Integer>> find_scc() {
 
+        List<List<Integer>> stronglyConnectedComponents = new ArrayList<>();
 
+        for(int i = 0; i < cap; i++){
+            dfs_state[i] = 0;
+            transpose_visited[i] = 0;
+            disco[i] = Integer.MAX_VALUE;
+            fin[i] = Integer.MAX_VALUE;
+            prev[i] = Integer.MIN_VALUE;
+        }
+        //dfs entire graph
+        for (int i : vertex) {
+            if (dfs_state[i] == 0) {
+                dfscc(i,dfs_state);
+            }
+        }
+        while (!scc_stack.isEmpty()) {
+            int v = scc_stack.pop();
+            if (transpose_visited[v] == 0) {
+                List<Integer> component = new ArrayList<>();
+                transpose.dfs(v, transpose_visited, component);
+                stronglyConnectedComponents.add(component);
+            }
+        }
 
+        return stronglyConnectedComponents;
 
-
-
-
-
-
-
-
-
-
-
+    }
 
     public void BFS_path(int s) {
         Queue<Integer> q = new LinkedList<>();
@@ -223,7 +262,7 @@ class Graph {
         distance = new int[cap];
         prev = new int[cap];
 
-        for (int i=0; i < cap; i++) {
+        for (int i = 0; i < cap; i++) {
             bfs_state[i] = 0;
             distance[i] = Integer.MAX_VALUE;
             prev[i] = Integer.MIN_VALUE;
@@ -298,7 +337,6 @@ class Graph {
 }
 
 public class Graph_file {
-
     public static void main(String[] args) {
         Graph graph = new Graph("dinput.txt");
 
