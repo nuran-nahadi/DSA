@@ -209,14 +209,30 @@ class Graph {
         return toporder;
     }
 
-    private void dfscc(int u, int[] visited){
+    private void dfscc(int u, int[] visited, List<Integer> comp){
+        visited[u] = 1;
+        time++;
+        disco[u] = time;
+        for (int i : reverse_list.get(u)) {
+            if (visited[i] == 0) {
+                prev[i] = u;
+                dfscc(i,visited,comp);
+            }
+        }
+        visited[u] = 2;
+        time++;
+        fin[u] = time;
+        comp.add(u);
+    }
+
+    private void dfs_util(int u, int[] visited){
         visited[u] = 1;
         time++;
         disco[u] = time;
         for (int i : adj_list.get(u)) {
             if (visited[i] == 0) {
                 prev[i] = u;
-                dfscc(i,visited);
+                dfs_util(i,visited);
             }
         }
         visited[u] = 2;
@@ -239,14 +255,14 @@ class Graph {
         //dfs entire graph
         for (int i : vertex) {
             if (dfs_state[i] == 0) {
-                dfscc(i,dfs_state);
+                dfs_util(i,dfs_state);
             }
         }
         while (!scc_stack.isEmpty()) {
             int v = scc_stack.pop();
             if (transpose_visited[v] == 0) {
                 List<Integer> component = new ArrayList<>();
-                transpose.dfs(v, transpose_visited, component);
+                dfscc(v, transpose_visited, component);
                 stronglyConnectedComponents.add(component);
             }
         }
@@ -254,6 +270,13 @@ class Graph {
         return stronglyConnectedComponents;
 
     }
+
+     public boolean contains(int u){
+        if (vertex.contains(u)) {
+            return true;
+        }
+        return false;
+     }
 
     public void BFS_path(int s) {
         Queue<Integer> q = new LinkedList<>();
@@ -338,17 +361,27 @@ class Graph {
 
 public class Graph_file {
     public static void main(String[] args) {
-        Graph graph = new Graph("dinput.txt");
+        Graph graph = new Graph("sccinput.txt");
+        List<List<Integer>> scclist = graph.find_scc();
 
-        System.out.println("Graph adjacency list:");
-        graph.displayGraph();
+        System.out.println("Strongly Connected Components in the given Graph:");
+        for (List<Integer> component : scclist) {
+            Collections.sort(component,Collections.reverseOrder());
+            for (int vertex : component) {
+                System.out.print(vertex + " ");
+            }
+            System.out.println();
+        }
 
-        System.out.println("\nPerforming DFS starting from vertex 5:");
-        graph.DFS(5);
+        // System.out.println("Graph adjacency list:");
+        // graph.displayGraph();
 
-        System.out.println("\nPerforming Topological Sort:");
-        List<Integer> topoOrder = graph.topologicalSort();
-        System.out.println("Topological Sort order: " + topoOrder);
+        // System.out.println("\nPerforming DFS starting from vertex 5:");
+        // graph.DFS(5);
+
+        // System.out.println("\nPerforming Topological Sort:");
+        // List<Integer> topoOrder = graph.topologicalSort();
+        // System.out.println("Topological Sort order: " + topoOrder);
 
     }
 }
