@@ -18,7 +18,7 @@ class Graph {
     int time = 0;
     int cap = 0;
 
-    Graph(){
+    Graph() {
         try {
             Scanner sc = new Scanner(System.in);
             int n = sc.nextInt();
@@ -174,18 +174,6 @@ class Graph {
 
     public void DFS(int s) {
 
-        // dfs_state = new int[cap];
-
-        // disco = new int[cap];
-        // fin = new int[cap];
-        // prev = new int[cap];
-
-        // for (int i = 0; i < cap; i++) {
-        //     dfs_state[i] = 0;
-        //     disco[i] = Integer.MAX_VALUE;
-        //     fin[i] = Integer.MAX_VALUE;
-        //     prev[i] = Integer.MIN_VALUE;
-        // }
         System.out.print("DFS traversal starting from vertex " + s + ":");
         DFS_visit(s);
     }
@@ -237,14 +225,14 @@ class Graph {
         return toporder;
     }
 
-    private void dfscc(int u, int[] visited, List<Integer> comp){
+    private void dfscc(int u, int[] visited, List<Integer> comp) {
         visited[u] = 1;
         time++;
         disco[u] = time;
         for (int i : reverse_list.get(u)) {
             if (visited[i] == 0) {
                 prev[i] = u;
-                dfscc(i,visited,comp);
+                dfscc(i, visited, comp);
             }
         }
         visited[u] = 2;
@@ -253,14 +241,14 @@ class Graph {
         comp.add(u);
     }
 
-    private void dfs_util(int u, int[] visited){
+    private void dfs_util(int u, int[] visited) {
         visited[u] = 1;
         time++;
         disco[u] = time;
         for (int i : adj_list.get(u)) {
             if (visited[i] == 0) {
                 prev[i] = u;
-                dfs_util(i,visited);
+                dfs_util(i, visited);
             }
         }
         visited[u] = 2;
@@ -269,14 +257,14 @@ class Graph {
         scc_stack.push(u);
     }
 
-    public void dfs_reverse(int u){
+    public void dfs_reverse(int u) {
         transpose_visited[u] = 1;
         time++;
         disco[u] = time;
         for (int i : reverse_list.get(u)) {
             if (transpose_visited[i] == 0) {
                 prev[i] = u;
-                dfsTraversal(i);
+                dfs_reverse(i);
             }
         }
         transpose_visited[u] = 2;
@@ -288,17 +276,17 @@ class Graph {
 
         List<List<Integer>> stronglyConnectedComponents = new ArrayList<>();
 
-        for(int i = 0; i < cap; i++){
+        for (int i = 0; i < cap; i++) {
             dfs_state[i] = 0;
             transpose_visited[i] = 0;
             disco[i] = Integer.MAX_VALUE;
             fin[i] = Integer.MAX_VALUE;
             prev[i] = Integer.MIN_VALUE;
         }
-        //dfs entire graph
+        // dfs entire graph
         for (int i : vertex) {
             if (dfs_state[i] == 0) {
-                dfs_util(i,dfs_state);
+                dfs_util(i, dfs_state);
             }
         }
         while (!scc_stack.isEmpty()) {
@@ -314,12 +302,12 @@ class Graph {
 
     }
 
-     public boolean contains(int u){
+    public boolean contains(int u) {
         if (vertex.contains(u)) {
             return true;
         }
         return false;
-     }
+    }
 
     public void BFS_path(int s) {
         Queue<Integer> q = new LinkedList<>();
@@ -402,56 +390,37 @@ class Graph {
     }
 }
 
-public class Graph_file {
+public class capcity {
     public static void main(String[] args) {
         Graph graph = new Graph();
-       // List<List<Integer>> scclist = graph.find_scc();
 
         List<Integer> ans = new ArrayList<>();
-        for(int i = 1; i< graph.cap;i++){
+        for (int i = 1; i < graph.cap; i++) {
             if (graph.contains(i)) {
                 graph.dfs_reverse(i);
+
                 int flag = 0;
-                for(int j = 1; j< graph.cap;j++){
+                for (int j = 1; j <= graph.cap; j++) {
                     if (graph.contains(j)) {
-                        if (graph.transpose_visited[j] != 2) {
+                        if (graph.transpose_visited[j] == 0) {
                             flag = 1;
                             break;
                         }
-                        
+
                     }
-                }
-                for (int j = 0; j < graph.cap; j++) {
-                    graph.transpose_visited[j] = 0;
                 }
                 if (flag == 0) {
                     ans.add(i);
                 }
+            }
+            for (int j = 0; j < graph.cap; j++) {
+                graph.transpose_visited[j] = 0;
             }
         }
         System.out.println(ans.size());
         for (Integer integer : ans) {
             System.out.print(integer + " ");
         }
-
-        // System.out.println("Strongly Connected Components in the given Graph:");
-        // for (List<Integer> component : scclist) {
-        //     Collections.sort(component,Collections.reverseOrder());
-        //     for (int vertex : component) {
-        //         System.out.print(vertex + " ");
-        //     }
-        //     System.out.println();
-        // }
-
-        // System.out.println("Graph adjacency list:");
-        // graph.displayGraph();
-
-        // System.out.println("\nPerforming DFS starting from vertex 5:");
-        // graph.DFS(5);
-
-        // System.out.println("\nPerforming Topological Sort:");
-        // List<Integer> topoOrder = graph.topologicalSort();
-        // System.out.println("Topological Sort order: " + topoOrder);
 
     }
 }
