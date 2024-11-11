@@ -4,10 +4,10 @@ import java.io.File;
 
 class Graph {
     List<List<Integer>> adj_list;
-    private List<List<Integer>> reverse_list;
-    private Set<Integer> vertex;
-    private Stack<Integer> topology = new Stack<>();
-    private Stack<Integer> scc_stack = new Stack<>();
+    List<List<Integer>> reverse_list;
+    Set<Integer> vertex;
+    Stack<Integer> topology = new Stack<>();
+    Stack<Integer> scc_stack = new Stack<>();
     int[] prev;
     int[] distance;
     int[] bfs_state;
@@ -46,7 +46,7 @@ class Graph {
         }
     }
 
-    private void init() {
+    void init() {
         prev = new int[1000000];
         distance = new int[1000000];
         dfs_state = new int[1000000];
@@ -179,7 +179,7 @@ class Graph {
         topology.push(u);
     }
 
-    private void dfsTraversal(int u) {
+    void dfsTraversal(int u) {
         dfs_state[u] = 1;
         time++;
         disco[u] = time;
@@ -209,7 +209,7 @@ class Graph {
         return toporder;
     }
 
-    private void dfscc(int u, int[] visited, List<Integer> comp){
+    void dfscc(int u, int[] visited, List<Integer> comp){
         visited[u] = 1;
         time++;
         disco[u] = time;
@@ -225,7 +225,7 @@ class Graph {
         comp.add(u);
     }
 
-    private void dfs_util(int u, int[] visited){
+    void dfs_util(int u, int[] visited){
         visited[u] = 1;
         time++;
         disco[u] = time;
